@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#235E92">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>loging</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="logo-icon.jpg">
+</head>
+<body style="background: #fff;">
+  
+  <div class="top-container">
+    <div class="loging_content">
+      <div class="loging-logo">
+        <img class="" src="logo-blue.png">
+      </div>
+      
+      <div class="lg-box-container">
+        <div class="loging-box">
+        <form name="login_form" id="login_form" method="post" action="#" enctype="multipart/form-data">
+          
+          <input class="loging-email" type="text" name="login_email" id="login_email" placeholder="Enter your email">
+          <p class="wrong-massage-email"></p>
+          
+          <input class="loging-password" type="password" name="login_password" id="login_password" class="form-control"  placeholder="Enter your password">
+          
+          <p class="wrong-massage-pass"></p>
+          
+          <button type="button" id="login" name="login" class="btn-success">Log In</button>
+          
+          <div class="fg-pass-box">
+            <li class="fg-pass">Forgotten password?</li>
+          </div>
+          <hr class="loging-card-hr">
+          <div class="account-create-btn-container">
+            <button type="button" class="create-new-acc-btn">Create new account</button>
+          </div>
+        </form>
+       
+      </div>
+      
+       <div class="singup-container">
+         <form name="registration_form" id="registration_form" method="post" action="#" enctype="multipart/form-data">
+           <input id="firstName" class="fristName" type="text" placeholder="Full name">
+         
+         
+         
+         <input id="email" class="Email" type="email" placeholder="Email address" >
+         <p class="wrongEmailmsg"></p>
+         
+         <input id="password" class="password" type="password" placeholder="Password" >
+         <p class="wrongPassMsg"></p>
+         
+         <div class="btn-box">
+           <button type="button" id="register" name="register" class="createUser-btn">Create new account</button>
+         </div>
+         <div class="lg-back-btn">
+           <button type="button" class="lg-back">Log In</button>
+         </form>
+         
+         </div>
+       </div>
+      
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <div class="bottom-container">
+    
+    
+  </div>
+  
+  
+  
+  	<script type="module">
+	  // Import the functions you need from the SDKs you need
+	  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+	  import { getDatabase, set, ref } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+	  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+	  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+
+
+
+
+	  const firebaseConfig = {
+    apiKey: "AIzaSyBIz8kZGSabIgxizxNZQFqCky04aZA3rLU",
+    authDomain: "socialbook-ff0f6.firebaseapp.com",
+    projectId: "socialbook-ff0f6",
+    storageBucket: "socialbook-ff0f6.appspot.com",
+    messagingSenderId: "758067396214",
+    appId: "1:758067396214:web:90af64252ad0d2aaa9a957"
+  };
+
+	  // Initialize Firebase
+	  const app = initializeApp(firebaseConfig);
+	  const analytics = getAnalytics(app);
+	  const auth = getAuth();
+	  const db = getDatabase();
+	  
+	  console.log(app);
+
+	  
+
+	  //----- New Registration code start	
+	  
+	document.getElementById("register").addEventListener("click", function() {
+	  var firstName = document.getElementById("firstName").value;
+	  
+		  var email =  document.getElementById("email").value;
+		  var password = document.getElementById("password").value;
+		  
+    
+    
+		  //For new registration
+		  createUserWithEmailAndPassword(auth, email, password)
+		  .then((userCredential) => {
+		    // Signed in 
+		    const user = userCredential.user;
+		    console.log(user);
+		    alert("Registration successfully!!");
+		    // ...
+		   var fristName = document.getElementById("firstName")
+       
+       var Email =  document.getElementById("email")
+       var Password = document.getElementById("password")
+    
+		    set(ref(db, 'User List/' + userCredential.user.uid),{
+		      FullName : fristName.value,
+		      Email     : Email.value,
+		      Password  : Password.value
+		    })
+		    
+		  })
+		  .catch((error) => {
+    const errorMessage = error.message;
+    const errorCode = error.code;
+    console.log(errorMessage);
+    if (errorCode === 'auth/invalid-email') {
+        document.querySelector('.wrongEmailmsg').textContent = errorMessage;
+        document.querySelector('.wrongPassMsg').textContent = ''; // পাসওয়ার্ড ত্রুটির ম্যাসেজ মুছে দেওয়া
+    } else {
+        document.querySelector('.wrongPassMsg').textContent = errorMessage;
+        document.querySelector('.wrongEmailmsg').textContent = ''; // ইমেল ত্রুটির ম্যাসেজ মুছে দেওয়া
+    }
+});
+});
+	  
+	  //----- End
+
+// লগইন কোড অনুসারে রিডাইরেক্ট করা
+document.getElementById("login").addEventListener("click", function() {
+    var email =  document.getElementById("login_email").value;
+    var password = document.getElementById("login_password").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        console.log(user);
+     alert(user.email + " Login successfully!!!");
+        
+        // Save user login info in localStorage
+        localStorage.setItem('userLoggedIn', true);
+        localStorage.setItem('userEmail', user.email);
+        
+        // Redirect to home page
+        window.location.href = "home.html";
+        
+        document.querySelector('.wrong-massage-email').textContent = '';
+        document.querySelector('.wrong-massage-pass').textContent = '';
+        // ...
+    })
+  .catch((error) => {
+    const errorMessage = error.message;
+    const errorCode = error.code;
+    console.log(errorMessage);
+    if (errorCode === 'auth/invalid-email') {
+        document.querySelector('.wrong-massage-email').textContent = errorMessage;
+        document.querySelector('.wrong-massage-pass').textContent = ''; // পাসওয়ার্ড ত্রুটির ম্যাসেজ মুছে দেওয়া
+        setTimeout(() => {
+            document.querySelector('.wrong-massage-email').textContent = '';
+        }, 4000); // সেট টাইমআউট ৩ সেকেন্ড
+    } else {
+        document.querySelector('.wrong-massage-pass').textContent = errorMessage;
+        document.querySelector('.wrong-massage-email').textContent = ''; // ইমেল ত্রুটির ম্যাসেজ মুছে দেওয়া
+        setTimeout(() => {
+            document.querySelector('.wrong-massage-pass').textContent = '';
+        }, 4000); // সেট টাইমআউট ৩ সেকেন্ড
+    }
+});
+});
+
+// Check if user is already logged in
+document.addEventListener("DOMContentLoaded", function() {
+    const isLoggedIn = localStorage.getItem('userLoggedIn');
+    const userEmail = localStorage.getItem('userEmail');
+    
+    if (isLoggedIn) {
+        // Redirect to home page
+        window.location.href = "home.html";
+    }
+});
+
+
+
+
+	  //----- End
+
+document.querySelector('.create-new-acc-btn').addEventListener('click', function(){
+   
+   document.querySelector('.singup-container').style.display = 'block';
+   document.querySelector('.loging-box').style.display = 'none'
+ });
+ 
+ // login back 
+ document.querySelector('.lg-back').addEventListener('click', function(){
+   
+   document.querySelector('.singup-container').style.display = 'none';
+   document.querySelector('.loging-box').style.display = 'block'
+   
+ });
+ 
+	</script>
+
+</body>
+
+</html>
